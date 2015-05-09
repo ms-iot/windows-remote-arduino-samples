@@ -80,21 +80,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <ProjectReference Include="..\..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.WindowsPhone\Microsoft.Maker.Firmata.WindowsPhone.vcxproj">
-      <Project>{83a94c48-af35-4fd9-b6c2-b0c12254abff}</Project>
-      <Name>Microsoft.Maker.Firmata.WindowsPhone</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.WindowsPhone\Microsoft.Maker.RemoteWiring.WindowsPhone.vcxproj">
-      <Project>{2b16a0fe-ea4f-411d-b25e-2ff9605c875b}</Project>
-      <Name>Microsoft.Maker.RemoteWiring.WindowsPhone</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.Serial\Microsoft.Maker.Serial.WindowsPhone\Microsoft.Maker.Serial.WindowsPhone.vcxproj">
-      <Project>{e26ce8ba-b9dc-45f6-8d7d-d019a42ade3f}</Project>
-      <Name>Microsoft.Maker.Serial.WindowsPhone</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -118,6 +103,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.WindowsPhone\Microsoft.Maker.Firmata.WindowsPhone.vcxproj">
+      <Project>{83a94c48-af35-4fd9-b6c2-b0c12254abff}</Project>
+      <Name>Microsoft.Maker.Firmata.WindowsPhone</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.WindowsPhone\Microsoft.Maker.RemoteWiring.WindowsPhone.vcxproj">
+      <Project>{2b16a0fe-ea4f-411d-b25e-2ff9605c875b}</Project>
+      <Name>Microsoft.Maker.RemoteWiring.WindowsPhone</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.Serial\Microsoft.Maker.Serial.WindowsPhone\Microsoft.Maker.Serial.WindowsPhone.vcxproj">
+      <Project>{e26ce8ba-b9dc-45f6-8d7d-d019a42ade3f}</Project>
+      <Name>Microsoft.Maker.Serial.WindowsPhone</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

@@ -103,21 +103,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <ProjectReference Include="..\..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.Windows\Microsoft.Maker.Firmata.Windows.vcxproj">
-      <Project>{8c570513-5fb3-4586-a757-b910e56b66a9}</Project>
-      <Name>Microsoft.Maker.Firmata.Windows</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.Windows\Microsoft.Maker.RemoteWiring.Windows.vcxproj">
-      <Project>{67adac13-ba28-4cb1-a706-17b0301171f1}</Project>
-      <Name>Microsoft.Maker.RemoteWiring.Windows</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.Serial\Microsoft.Maker.Serial.Windows\Microsoft.Maker.Serial.Windows.vcxproj">
-      <Project>{02438027-2444-49cb-87bf-ac4d4df8ef0f}</Project>
-      <Name>Microsoft.Maker.Serial.Windows</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -140,6 +125,20 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.Windows\Microsoft.Maker.Firmata.Windows.vcxproj">
+      <Project>{8c570513-5fb3-4586-a757-b910e56b66a9}</Project>
+      <Name>Microsoft.Maker.Firmata.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.Windows\Microsoft.Maker.RemoteWiring.Windows.vcxproj">
+      <Project>{67adac13-ba28-4cb1-a706-17b0301171f1}</Project>
+      <Name>Microsoft.Maker.RemoteWiring.Windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\remote-wiring\Microsoft.Maker.win8_1\Microsoft.Maker.Serial\Microsoft.Maker.Serial.Windows\Microsoft.Maker.Serial.Windows.vcxproj">
+      <Project>{02438027-2444-49cb-87bf-ac4d4df8ef0f}</Project>
+      <Name>Microsoft.Maker.Serial.Windows</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>

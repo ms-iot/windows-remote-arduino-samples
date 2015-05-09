@@ -43,7 +43,7 @@ namespace RemoteBlinky
             bluetooth.ConnectionEstablished += OnConnectionEstablished;
 
             //these parameters don't matter for bluetooth
-            bluetooth.begin(0, 0);
+            bluetooth.begin(115200, SerialConfig.SERIAL_8N1);
         }
 
         private void OnConnectionEstablished()

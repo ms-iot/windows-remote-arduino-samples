@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  IgnorableNamespaces="uap mp">
+
+  <Identity
+    Name="3431dd42-17e1-45df-a2e5-370548be629c"
+    Publisher="CN=jessefr"
+    Version="1.0.0.0" />
+
+  <mp:PhoneIdentity PhoneProductId="3431dd42-17e1-45df-a2e5-370548be629c" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+
+  <Properties>
+    <DisplayName>remote-controlled-car</DisplayName>
+    <PublisherDisplayName>jessefr</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.10042.0" MaxVersionTested="10.0.10069.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="x-generate"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="$targetnametoken$.exe"
+      EntryPoint="remote_controlled_car.App">
+      <uap:VisualElements
+        DisplayName="remote-controlled-car"
+        Square150x150Logo="Assets\Logo.png"
+        Square44x44Logo="Assets\SmallLogo.png"
+        Description="remote-controlled-car"
+        
+        BackgroundColor="#464646">
+        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <DeviceCapability Name="bluetooth.rfcomm">
+      <Device Id="any">
+        <Function Type="name:serialPort"/>
+      </Device>
+    </DeviceCapability>
+  </Capabilities>
+</Package>

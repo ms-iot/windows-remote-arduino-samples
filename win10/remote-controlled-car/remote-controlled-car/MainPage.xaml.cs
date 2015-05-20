@@ -1,8 +1,12 @@
-﻿using Windows.UI.Xaml;
+﻿using System;
+using Windows.UI.Xaml.Navigation;
+using Windows.Devices.Enumeration;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.Devices.Sensors;
 using Microsoft.Maker.Serial;
 using Microsoft.Maker.RemoteWiring;
+using remote_controlled_car.Communication;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -13,11 +17,7 @@ namespace remote_controlled_car
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        //each numbered button on the first page will attempt to connect to the device with the corresponding numbered device name below
-        //to connect to your own RC cars, you'll want to change the device name for at least one of these strings!
-        private const string CAR_ONE_BLUETOOTH_DEVICE_NAME = "RNBT-773E";
-        private const string CAR_TWO_BLUETOOTH_DEVICE_NAME = "RNBT-73B5";
-        private const string CAR_THREE_BLUETOOTH_DEVICE_NAME = "RNBT-777E";
+        private Connections _connections = null;
 
         public MainPage()
         {
@@ -34,58 +34,86 @@ namespace remote_controlled_car
             }
         }
 
-        private void carButton_Click( object sender, RoutedEventArgs e )
+        protected override void OnNavigatedTo( NavigationEventArgs e )
         {
-            setButtonsEnabled( false );
-            mTextBlock.Text = "Attempting to connect...";
-
-            Button button = sender as Button;
-            
-            switch( button.Name )
+            base.OnNavigatedTo( e );
+            if( _connections == null )
             {
-                case "carOneButton":
-                    App.bluetooth = new BluetoothSerial( CAR_ONE_BLUETOOTH_DEVICE_NAME );
-                    break;
-
-                case "carTwoButton":
-                    App.bluetooth = new BluetoothSerial( CAR_TWO_BLUETOOTH_DEVICE_NAME );
-                    break;
-
-                case "carThreeButton":
-                    App.bluetooth = new BluetoothSerial( CAR_THREE_BLUETOOTH_DEVICE_NAME );
-                    break;
-
-                default:
-                    App.bluetooth = new BluetoothSerial();
-                    break;
+                RefreshDeviceList();
             }
-
-            App.bluetooth.ConnectionEstablished += Bluetooth_ConnectionEstablished;
-            App.bluetooth.ConnectionFailed += Bluetooth_ConnectionFailed;
-            App.arduino = new RemoteDevice( App.bluetooth );
-            App.bluetooth.begin( 0, 0 );
         }
 
-        private void Bluetooth_ConnectionFailed( string message )
+        private void RefreshDeviceList()
+        {
+            //invoke the listAvailableDevicesAsync method of BluetoothSerial. Since it is Async, we will wrap it in a Task and add a llambda to execute when finished
+            BluetoothSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>().ContinueWith( listTask =>
+            {
+                //store the result and populate the device list on the UI thread
+                var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
+                {
+                    _connections = new Connections();
+                    foreach( DeviceInformation device in listTask.Result )
+                    {
+                        _connections.Add( new Connection( device.Name, device ) );
+                    }
+                    connectList.ItemsSource = _connections;
+                } ) );
+            } );
+        }
+
+        private void Refresh_Click( object sender, RoutedEventArgs e )
+        {
+            RefreshDeviceList();
+        }
+
+        private void Reconnect_Click( object sender, RoutedEventArgs e )
+        {
+            if( connectList.SelectedItem != null )
+            {
+                setButtonsEnabled( false );
+                mTextBlock.Text = "Connecting...";
+
+                var selectedConnection = connectList.SelectedItem as Connection;
+                var device = selectedConnection.Source as DeviceInformation;
+
+                //construct the bluetooth serial object with the specified device
+                App.bluetooth = new BluetoothSerial( device );
+
+                App.bluetooth.ConnectionEstablished += Bluetooth_ConnectionEstablished;
+                App.bluetooth.ConnectionFailed += Bluetooth_ConnectionFailed;
+                App.arduino = new RemoteDevice( App.bluetooth );
+                App.bluetooth.begin( 115200, 0 );
+            }
+        }
+
+        private void Bluetooth_ConnectionFailed()
         {
             App.bluetooth.ConnectionEstablished -= Bluetooth_ConnectionEstablished;
             App.bluetooth.ConnectionFailed -= Bluetooth_ConnectionFailed;
-            setButtonsEnabled( true );
-            mTextBlock.Text = "Connection failed.";
+            var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
+            {
+                setButtonsEnabled( true );
+                mTextBlock.Text = "Connection failed.";
+            } ) );
         }
 
         private void Bluetooth_ConnectionEstablished()
         {
             App.bluetooth.ConnectionEstablished -= Bluetooth_ConnectionEstablished;
             App.bluetooth.ConnectionFailed -= Bluetooth_ConnectionFailed;
-            Frame.Navigate( typeof( ControlPage ) );
+            var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
+            {
+                Frame.Navigate( typeof( ControlPage ) );
+            } ) );
         }
 
         private void setButtonsEnabled( bool enabled )
         {
-            carOneButton.IsEnabled = enabled;
-            carTwoButton.IsEnabled = enabled;
-            carThreeButton.IsEnabled = enabled;
+            var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
+            {
+                Reconnect.IsEnabled = enabled;
+                Refresh.IsEnabled = enabled;
+            } ) );
         }
     }
 }

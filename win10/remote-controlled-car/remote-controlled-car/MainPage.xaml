@@ -8,9 +8,14 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <TextBlock Height="30" HorizontalAlignment="Center" VerticalAlignment="Top"  Margin="0,80,0,0" Name="mTextBlock" Text="Select a car" Foreground="Black" FontSize="20" FontWeight="Bold"/>
-        <Button Content="Car #1" Height="72" IsEnabled="True" HorizontalAlignment="Left" Margin="20,10,0,0" Name="carOneButton" VerticalAlignment="Center" Width="120" Click="carButton_Click" />
-        <Button Content="Car #2" Height="72" IsEnabled="True" HorizontalAlignment="Center" Margin="0,10,0,0" Name="carTwoButton" VerticalAlignment="Center" Width="120" Click="carButton_Click"/>
-        <Button Content="Car #3" Height="72" IsEnabled="True" HorizontalAlignment="Right" Margin="0,10,20,0" Name="carThreeButton" VerticalAlignment="Center" Width="120" Click="carButton_Click"/>
+        <TextBlock Height="30" HorizontalAlignment="Center" VerticalAlignment="Top"  Margin="10,40,0,10" Name="mTextBlock" Text="Select your bluetooth device" Foreground="Black" FontSize="20" FontWeight="Bold"/>
+        <StackPanel x:Name="ConnectStackParent" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+            <ListBox x:Name="connectList" DisplayMemberPath="DisplayName" />
+        </StackPanel>
+
+        <StackPanel VerticalAlignment="Bottom" Orientation="Horizontal">
+            <Button x:Uid="Connect" x:Name="Reconnect" Click="Reconnect_Click" HorizontalAlignment="Center" Margin="20,0,0,10">Connect</Button>
+            <Button x:Uid="RefreshBtn" x:Name="Refresh" Click="Refresh_Click" HorizontalAlignment="Right" Margin="10,0,20,10">Refresh</Button>
+        </StackPanel>
     </Grid>
 </Page>

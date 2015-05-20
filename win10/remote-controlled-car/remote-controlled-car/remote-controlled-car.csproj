@@ -94,6 +94,8 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Communication\Connection.cs" />
+    <Compile Include="Communication\Connections.cs" />
     <Compile Include="ControlPage.xaml.cs">
       <DependentUpon>ControlPage.xaml</DependentUpon>
     </Compile>
@@ -133,24 +135,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Maker.Firmata, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\git\remote-wiring\Microsoft.Maker.win10\ARM\Debug\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.winmd</HintPath>
-      <IsWinMDFile>true</IsWinMDFile>
-      <Implementation>Microsoft.Maker.Firmata.dll</Implementation>
-    </Reference>
-    <Reference Include="Microsoft.Maker.RemoteWiring, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\git\remote-wiring\Microsoft.Maker.win10\ARM\Debug\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.winmd</HintPath>
-      <IsWinMDFile>true</IsWinMDFile>
-      <Implementation>Microsoft.Maker.RemoteWiring.dll</Implementation>
-    </Reference>
-    <Reference Include="Microsoft.Maker.Serial, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\git\remote-wiring\Microsoft.Maker.win10\ARM\Debug\Microsoft.Maker.Serial\Microsoft.Maker.Serial.winmd</HintPath>
-      <IsWinMDFile>true</IsWinMDFile>
-      <Implementation>Microsoft.Maker.Serial.dll</Implementation>
-    </Reference>
     <Reference Include="System.Numerics.Vectors, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.0.0\lib\win8\System.Numerics.Vectors.dll</HintPath>
       <Private>True</Private>
@@ -167,6 +151,20 @@
     <SDKReference Include="WindowsMobile, Version=10.0.0.1">
       <Name>Microsoft Mobile Extension SDK for Universal App Platform</Name>
     </SDKReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.vcxproj">
+      <Project>{f0a53bc9-c617-47dd-8b68-f91e3502d633}</Project>
+      <Name>Microsoft.Maker.Firmata</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.vcxproj">
+      <Project>{5a8b1bb1-7cd5-47c4-a1f7-d7bcf5facad1}</Project>
+      <Name>Microsoft.Maker.RemoteWiring</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.Serial\Microsoft.Maker.Serial.vcxproj">
+      <Project>{8376216c-282a-4927-b9ef-c2d545fe0bca}</Project>
+      <Name>Microsoft.Maker.Serial</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

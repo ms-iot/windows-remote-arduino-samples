@@ -1,0 +1,21 @@
+﻿<Page
+    x:Class="remote_controlled_car.ControlPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:remote_controlled_car"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Button Content="Start" Height="72" IsEnabled="False" HorizontalAlignment="Left" Margin="20,10,0,0" Name="startButton" VerticalAlignment="Top" Width="160" Click="startButton_Click" />
+        <Button Content="Stop" Height="72" IsEnabled="False" HorizontalAlignment="Right" Margin="0,10,20,0" Name="stopButton" VerticalAlignment="Top" Width="160" Click="stopButton_Click"/>
+        <TextBlock Height="30" HorizontalAlignment="Left"  Margin="20,100,0,0" Name="xTextBlock" Text="X: 1.0" VerticalAlignment="Top" Foreground="Red" FontSize="20" FontWeight="Bold"/>
+        <TextBlock Height="30" HorizontalAlignment="Left"  Margin="0,150,0,0" Name="yTextBlock" Text="Y: 1.0" VerticalAlignment="Top" Foreground="Green" FontSize="20" FontWeight="Bold"/>
+        <TextBlock Height="30" HorizontalAlignment="Left"  Margin="0,2000,20,0" Name="zTextBlock" Text="Z: 1.0" VerticalAlignment="Top"  Foreground="Blue" FontSize="20" FontWeight="Bold"/>
+        <Line x:Name="xLine" X1="215" Y1="165" X2="315" Y2="165" Stroke="Red" StrokeThickness="4"></Line>
+        <Line x:Name="yLine" X1="215" Y1="165" X2="215" Y2="85" Stroke="Green" StrokeThickness="4"></Line>
+        <TextBlock Height="30" HorizontalAlignment="Center" Margin="6,571,6,0" Name="statusTextBlock" Text="TextBlock" VerticalAlignment="Top" Width="444" />
+        <Button Content="Disconnect" Height="72" IsEnabled="False" HorizontalAlignment="Center" Margin="0,10,20,0" Name="disconnectButton" VerticalAlignment="Bottom" Width="160" Click="disconnectButton_Click"/>
+    </Grid>
+</Page>

@@ -1,0 +1,8 @@
+﻿<Application
+    x:Class="remote_controlled_car.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:remote_controlled_car"
+    RequestedTheme="Light">
+
+</Application>

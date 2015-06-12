@@ -11,13 +11,13 @@ using Windows.System.Display;
 namespace remote_controlled_car
 {
     /// <summary>
-    /// This class controls a motor shield connected to an Arduino to drive forward and back while also optionally
-    ///     turning left or right. It is the preferred method for RC car control and should work with most motor shields.
-    /// This class works by using one pin as DIRECTION control (telling a motor to move forward or in reverse) for each motor
-    ///     and one pin as MOTOR control (power or no power) for each motor. Turn motor control is binary (either turn or no turn)
-    ///     while forward/back is allows for analog power (variable velocity)
+    /// This class controls the original Maisto PCB connected to an Arduino to drive forward and back while also optionally
+    ///     turning left or right. It is nearly identical to ControlPage.xaml.cs, but the way in which this board is controlled is different.
+    /// Unlike ControlPage, this class (ControlPageMaisto) is specific to the behavior of the Maisto PCB. The Maisto board uses two pins to control each motor.
+    ///     Powering the left control pin moves the motor one direction, while powering the right control pin moves it in the other direction. The forward/back pins
+    ///     work in the same way. Therefore, it is crucial not to attempt to power both of these pins at the same time.
     /// </summary>
-    public sealed partial class ControlPage : Page
+    public sealed partial class ControlPageMaisto : Page
     {
         private enum Turn
         {
@@ -44,15 +44,10 @@ namespace remote_controlled_car
          *   analog power is not desired. Therefore, you will see the direction control pins being switched when the phone tilt changes from fwd/back
          *   and left/right, and you'll notice that the FB_MOTOR_CONTROL_PIN is driven with analogWrite while the LR_MOTOR_CONTROL_PIN is driven with digitalWrite
          */
-        private const byte FB_DIRECTION_CONTROL_PIN = 8;
-        private const byte FB_MOTOR_CONTROL_PIN = 9;
-        private const byte LR_DIRECTION_CONTROL_PIN = 2;
-        private const byte LR_MOTOR_CONTROL_PIN = 3;
-		
-        private const PinState LEFT = PinState.LOW;
-        private const PinState RIGHT = PinState.HIGH;
-        private const PinState FORWARD = PinState.LOW;
-        private const PinState REVERSE = PinState.HIGH;
+        private const byte FORWARD_CONTROL_PIN = 8;
+        private const byte REVERSE_CONTROL_PIN = 9;
+        private const byte LEFT_CONTROL_PIN = 10;
+        private const byte RIGHT_CONTROL_PIN = 11;
 
         private DisplayRequest keepScreenOnRequest;
         private Accelerometer accelerometer;
@@ -61,7 +56,7 @@ namespace remote_controlled_car
         private Turn turn;
         private Direction direction;
 
-        public ControlPage()
+        public ControlPageMaisto()
         {
             this.InitializeComponent();
 
@@ -87,10 +82,10 @@ namespace remote_controlled_car
             keepScreenOnRequest = new DisplayRequest();
             keepScreenOnRequest.RequestActive();
 
-            App.arduino.pinMode( LR_DIRECTION_CONTROL_PIN, PinMode.OUTPUT );
-            App.arduino.pinMode( FB_DIRECTION_CONTROL_PIN, PinMode.OUTPUT );
-            App.arduino.pinMode( LR_MOTOR_CONTROL_PIN, PinMode.PWM );
-            App.arduino.pinMode( FB_MOTOR_CONTROL_PIN, PinMode.PWM );
+            App.arduino.pinMode( FORWARD_CONTROL_PIN, PinMode.OUTPUT );
+            App.arduino.pinMode( REVERSE_CONTROL_PIN, PinMode.OUTPUT );
+            App.arduino.pinMode( LEFT_CONTROL_PIN, PinMode.OUTPUT );
+            App.arduino.pinMode( RIGHT_CONTROL_PIN, PinMode.OUTPUT );
         }
 
         private void Bluetooth_ConnectionLost()
@@ -119,32 +114,31 @@ namespace remote_controlled_car
                 //if we've switched directions, we need to be careful about how we switch
                 if( turn != Turn.left )
                 {
-                    //stop motor & set direction left
-                    arduino.digitalWrite( LR_MOTOR_CONTROL_PIN, PinState.LOW );
-                    arduino.digitalWrite( LR_DIRECTION_CONTROL_PIN, LEFT );
+                    //make sure we aren't turning right
+                    arduino.digitalWrite( RIGHT_CONTROL_PIN, PinState.LOW );
                 }
 
                 //start the motor by setting the pin high
-                arduino.digitalWrite( LR_MOTOR_CONTROL_PIN, PinState.HIGH );
+                arduino.digitalWrite( LEFT_CONTROL_PIN, PinState.HIGH );
                 turn = Turn.left;
             }
             else if( lr > LR_MAG )
             {
                 if( turn != Turn.right )
                 {
-                    //stop motor & set direction right
-                    arduino.digitalWrite( LR_MOTOR_CONTROL_PIN, PinState.LOW );
-                    arduino.digitalWrite( LR_DIRECTION_CONTROL_PIN, RIGHT );
+                    //make sure we aren't turning left
+                    arduino.digitalWrite( LEFT_CONTROL_PIN, PinState.LOW );
                 }
 
                 //start the motor by setting the pin high
-                arduino.digitalWrite( LR_MOTOR_CONTROL_PIN, PinState.HIGH );
+                arduino.digitalWrite( RIGHT_CONTROL_PIN, PinState.HIGH );
                 turn = Turn.right;
             }
             else
             {
-                //stop the motor
-                arduino.digitalWrite( LR_MOTOR_CONTROL_PIN, PinState.LOW );
+                //stop any pins that may be high
+                arduino.digitalWrite( LEFT_CONTROL_PIN, PinState.LOW );
+                arduino.digitalWrite( RIGHT_CONTROL_PIN, PinState.LOW );
                 turn = Turn.none;
             }
         }
@@ -163,49 +157,36 @@ namespace remote_controlled_car
             if( fb < -FB_MAG )
             {
                 //reading is less than the negative magnitude, the phone is being tilted back and the car should reverse
-                double weight = -( fb + FB_MAG );
-                byte analogVal = mapWeight( weight );
-
                 if( direction != Direction.reverse )
                 {
-                    //stop motor & set direction forward
-                    arduino.analogWrite( FB_MOTOR_CONTROL_PIN, 0 );
-                    arduino.digitalWrite( FB_DIRECTION_CONTROL_PIN, REVERSE );
+                    //make sure we aren't moving forward
+                    arduino.digitalWrite( FORWARD_CONTROL_PIN, PinState.LOW );
                 }
 
-                //start the motor by setting the pin to the appropriate analog value
-                arduino.analogWrite( FB_MOTOR_CONTROL_PIN, analogVal );
+                //start the motor by setting the reverse pin high
+                arduino.digitalWrite( REVERSE_CONTROL_PIN, PinState.HIGH );
                 direction = Direction.reverse;
             }
             else if( fb > 0 )
             {
                 //reading is greater than zero, the phone is being tilted forward and the car should move forward
-                byte analogVal = mapWeight( fb );
-
                 if( direction != Direction.forward )
                 {
-                    //stop motor & set direction forward
-                    arduino.analogWrite( FB_MOTOR_CONTROL_PIN, 0 );
-                    arduino.digitalWrite( FB_DIRECTION_CONTROL_PIN, FORWARD );
+                    //make sure we aren't moving backward
+                    arduino.digitalWrite( REVERSE_CONTROL_PIN, PinState.LOW );
                 }
 
-                //start the motor by setting the pin to the appropriate analog value
-                arduino.analogWrite( FB_MOTOR_CONTROL_PIN, analogVal );
+                //start the motor by setting the forward pin high
+                arduino.digitalWrite( FORWARD_CONTROL_PIN, PinState.HIGH );
                 direction = Direction.forward;
             }
             else
             {
                 //reading is in the neutral zone (between -FB_MAG and 0) and the car should stop/idle
-                arduino.analogWrite( FB_MOTOR_CONTROL_PIN, 0 );
+                arduino.digitalWrite( REVERSE_CONTROL_PIN, PinState.LOW );
+                arduino.digitalWrite( FORWARD_CONTROL_PIN, PinState.LOW );
                 direction = Direction.none;
             }
-        }
-
-        private byte mapWeight( double weight )
-        {
-            //the value should be [0, 0.5], but we want to clamp the value between [0, 1]
-            weight = Math.Max( Math.Min( weight * 2, 1.0 ), 0.0 );
-            return (byte)( weight * MAX_ANALOG_VALUE );
         }
 
         private void startButton_Click( object sender, RoutedEventArgs e )
@@ -226,8 +207,10 @@ namespace remote_controlled_car
             }
             turn = Turn.none;
             direction = Direction.none;
-            arduino.analogWrite( FB_MOTOR_CONTROL_PIN, 0 );
-            arduino.digitalWrite( LR_MOTOR_CONTROL_PIN, PinState.LOW );
+            arduino.digitalWrite( LEFT_CONTROL_PIN, PinState.LOW );
+            arduino.digitalWrite( RIGHT_CONTROL_PIN, PinState.LOW );
+            arduino.digitalWrite( FORWARD_CONTROL_PIN, PinState.LOW );
+            arduino.digitalWrite( REVERSE_CONTROL_PIN, PinState.LOW );
         }
 
         private void disconnectButton_Click( object sender, RoutedEventArgs e )

@@ -1,12 +1,12 @@
 ﻿using System;
-using Windows.UI.Xaml.Navigation;
 using Windows.Devices.Enumeration;
+using Windows.Devices.Sensors;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.Devices.Sensors;
+using Windows.UI.Xaml.Navigation;
+using Communication;
 using Microsoft.Maker.Serial;
 using Microsoft.Maker.RemoteWiring;
-using remote_controlled_car.Communication;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -23,8 +23,8 @@ namespace remote_controlled_car
         {
             this.InitializeComponent();
 
-            App.accelerometer = Accelerometer.GetDefault();
-            if( App.accelerometer == null )
+            App.Accelerometer = Accelerometer.GetDefault();
+            if( App.Accelerometer == null )
             {
                 // The device on which the application is running does not support
                 // the accelerometer sensor. Alert the user and disable the
@@ -77,19 +77,19 @@ namespace remote_controlled_car
                 var device = selectedConnection.Source as DeviceInformation;
 
                 //construct the bluetooth serial object with the specified device
-                App.bluetooth = new BluetoothSerial( device );
+                App.Bluetooth = new BluetoothSerial( device );
 
-                App.bluetooth.ConnectionEstablished += Bluetooth_ConnectionEstablished;
-                App.bluetooth.ConnectionFailed += Bluetooth_ConnectionFailed;
-                App.arduino = new RemoteDevice( App.bluetooth );
-                App.bluetooth.begin( 115200, 0 );
+                App.Bluetooth.ConnectionEstablished += Bluetooth_ConnectionEstablished;
+                App.Bluetooth.ConnectionFailed += Bluetooth_ConnectionFailed;
+                App.Arduino = new RemoteDevice( App.Bluetooth );
+                App.Bluetooth.begin( 115200, 0 );
             }
         }
 
-        private void Bluetooth_ConnectionFailed()
+        private void Bluetooth_ConnectionFailed( string message )
         {
-            App.bluetooth.ConnectionEstablished -= Bluetooth_ConnectionEstablished;
-            App.bluetooth.ConnectionFailed -= Bluetooth_ConnectionFailed;
+            App.Bluetooth.ConnectionEstablished -= Bluetooth_ConnectionEstablished;
+            App.Bluetooth.ConnectionFailed -= Bluetooth_ConnectionFailed;
             var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
             {
                 setButtonsEnabled( true );
@@ -99,8 +99,8 @@ namespace remote_controlled_car
 
         private void Bluetooth_ConnectionEstablished()
         {
-            App.bluetooth.ConnectionEstablished -= Bluetooth_ConnectionEstablished;
-            App.bluetooth.ConnectionFailed -= Bluetooth_ConnectionFailed;
+            App.Bluetooth.ConnectionEstablished -= Bluetooth_ConnectionEstablished;
+            App.Bluetooth.ConnectionFailed -= Bluetooth_ConnectionFailed;
             var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
             {
                 Frame.Navigate( typeof( ControlPage ) );

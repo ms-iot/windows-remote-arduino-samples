@@ -51,7 +51,7 @@ namespace remote_controlled_car
 
         private DisplayRequest keepScreenOnRequest;
         private Accelerometer accelerometer;
-        private BluetoothSerial bluetooth;
+        private IStream bluetooth;
         private RemoteDevice arduino;
         private Turn turn;
         private Direction direction;
@@ -63,9 +63,9 @@ namespace remote_controlled_car
             turn = Turn.none;
             direction = Direction.none;
 
-            accelerometer = App.accelerometer;
-            bluetooth = App.bluetooth;
-            arduino = App.arduino;
+            accelerometer = App.Accelerometer;
+            bluetooth = App.Bluetooth;
+            arduino = App.Arduino;
 
             if( accelerometer == null || bluetooth == null || arduino == null )
             {
@@ -82,13 +82,13 @@ namespace remote_controlled_car
             keepScreenOnRequest = new DisplayRequest();
             keepScreenOnRequest.RequestActive();
 
-            App.arduino.pinMode( FORWARD_CONTROL_PIN, PinMode.OUTPUT );
-            App.arduino.pinMode( REVERSE_CONTROL_PIN, PinMode.OUTPUT );
-            App.arduino.pinMode( LEFT_CONTROL_PIN, PinMode.OUTPUT );
-            App.arduino.pinMode( RIGHT_CONTROL_PIN, PinMode.OUTPUT );
+            App.Arduino.pinMode( FORWARD_CONTROL_PIN, PinMode.OUTPUT );
+            App.Arduino.pinMode( REVERSE_CONTROL_PIN, PinMode.OUTPUT );
+            App.Arduino.pinMode( LEFT_CONTROL_PIN, PinMode.OUTPUT );
+            App.Arduino.pinMode( RIGHT_CONTROL_PIN, PinMode.OUTPUT );
         }
 
-        private void Bluetooth_ConnectionLost()
+        private void Bluetooth_ConnectionLost( string message )
         {
             stopAndReturn();
         }
@@ -235,9 +235,9 @@ namespace remote_controlled_car
         private void stopAndReturn()
         {
             stopButton_Click( null, null );
-            App.bluetooth.end();
-            App.bluetooth = null;
-            App.arduino = null;
+            App.Bluetooth.end();
+            App.Bluetooth = null;
+            App.Arduino = null;
             Frame.Navigate( typeof( MainPage ) );
         }
     }

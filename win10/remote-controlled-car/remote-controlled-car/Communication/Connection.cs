@@ -1,4 +1,4 @@
-namespace remote_controlled_car.Communication
+namespace Communication
 {
     public class Connection
     {

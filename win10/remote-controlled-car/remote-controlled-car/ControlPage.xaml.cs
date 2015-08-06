@@ -34,7 +34,7 @@ namespace remote_controlled_car
         }
 
         private const double LR_MAG = 0.4;
-        private const double FB_MAG = 0.5;
+        private const double FB_MAG = 0.4;
         private const double MAX_ANALOG_VALUE = 255.0;
 
         /*
@@ -102,9 +102,9 @@ namespace remote_controlled_car
         {
             var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () => UpdateUI( accel.Reading ) ) );
 
-            //X is the left/right tilt, while Y is the fwd/rev tilt
-            double lr = accel.Reading.AccelerationX;
-            double fb = accel.Reading.AccelerationY;
+            //Y is the left/right tilt, while X is the fwd/rev tilt
+            double lr = -accel.Reading.AccelerationY;
+            double fb = accel.Reading.AccelerationX;
 
             handleTurn( lr );
             handleDirection( fb );

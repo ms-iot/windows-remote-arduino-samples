@@ -5,11 +5,11 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteBlinky", "RemoteBlinky\RemoteBlinky.csproj", "{5874144C-87D4-4042-833A-8F7D1EB644DF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.Maker.Serial", "..\..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.Serial\Microsoft.Maker.Serial.vcxproj", "{8376216C-282A-4927-B9EF-C2D545FE0BCA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.Maker.Firmata", "..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.vcxproj", "{F0A53BC9-C617-47DD-8B68-F91E3502D633}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.Maker.Firmata", "..\..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.Firmata\Microsoft.Maker.Firmata.vcxproj", "{F0A53BC9-C617-47DD-8B68-F91E3502D633}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.Maker.RemoteWiring", "..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.vcxproj", "{5A8B1BB1-7CD5-47C4-A1F7-D7BCF5FACAD1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.Maker.RemoteWiring", "..\..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.RemoteWiring\Microsoft.Maker.RemoteWiring.vcxproj", "{5A8B1BB1-7CD5-47C4-A1F7-D7BCF5FACAD1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Microsoft.Maker.Serial", "..\..\remote-wiring\Microsoft.Maker.win10\Microsoft.Maker.Serial\Microsoft.Maker.Serial.vcxproj", "{8376216C-282A-4927-B9EF-C2D545FE0BCA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,18 +39,6 @@ Global
 		{5874144C-87D4-4042-833A-8F7D1EB644DF}.Release|x86.ActiveCfg = Release|x86
 		{5874144C-87D4-4042-833A-8F7D1EB644DF}.Release|x86.Build.0 = Release|x86
 		{5874144C-87D4-4042-833A-8F7D1EB644DF}.Release|x86.Deploy.0 = Release|x86
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|ARM.ActiveCfg = Debug|ARM
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|ARM.Build.0 = Debug|ARM
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|x64.ActiveCfg = Debug|x64
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|x64.Build.0 = Debug|x64
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|x86.ActiveCfg = Debug|Win32
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|x86.Build.0 = Debug|Win32
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|ARM.ActiveCfg = Release|ARM
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|ARM.Build.0 = Release|ARM
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|x64.ActiveCfg = Release|x64
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|x64.Build.0 = Release|x64
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|x86.ActiveCfg = Release|Win32
-		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|x86.Build.0 = Release|Win32
 		{F0A53BC9-C617-47DD-8B68-F91E3502D633}.Debug|ARM.ActiveCfg = Debug|ARM
 		{F0A53BC9-C617-47DD-8B68-F91E3502D633}.Debug|ARM.Build.0 = Debug|ARM
 		{F0A53BC9-C617-47DD-8B68-F91E3502D633}.Debug|x64.ActiveCfg = Debug|x64
@@ -75,6 +63,18 @@ Global
 		{5A8B1BB1-7CD5-47C4-A1F7-D7BCF5FACAD1}.Release|x64.Build.0 = Release|x64
 		{5A8B1BB1-7CD5-47C4-A1F7-D7BCF5FACAD1}.Release|x86.ActiveCfg = Release|Win32
 		{5A8B1BB1-7CD5-47C4-A1F7-D7BCF5FACAD1}.Release|x86.Build.0 = Release|Win32
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|ARM.ActiveCfg = Debug|ARM
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|ARM.Build.0 = Debug|ARM
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|x64.ActiveCfg = Debug|x64
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|x64.Build.0 = Debug|x64
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|x86.ActiveCfg = Debug|Win32
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Debug|x86.Build.0 = Debug|Win32
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|ARM.ActiveCfg = Release|ARM
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|ARM.Build.0 = Release|ARM
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|x64.ActiveCfg = Release|x64
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|x64.Build.0 = Release|x64
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|x86.ActiveCfg = Release|Win32
+		{8376216C-282A-4927-B9EF-C2D545FE0BCA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

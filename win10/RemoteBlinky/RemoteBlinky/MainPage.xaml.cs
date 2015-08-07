@@ -1,7 +1,7 @@
 ﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Microsoft.Maker.Serial;
 using Microsoft.Maker.RemoteWiring;
+using System;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -12,74 +12,77 @@ namespace RemoteBlinky
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private bool useBluetooth = true;
-        /*
-         * select one of the following connection types, Bluetooth or USB. This solution contains code for both, but you should only use one at a time.
-         *  to select one, set the boolean property above to TRUE to use bluetooth, or leave FALSE to use USB.
-         *
-         * If using Bluetooth + Windows Phone, you will need to remove the "USB" capability from this solution.
-         *   - See the <DeviceCapabilities> near the bottom of the .appxmanifest file, which you can find in the Solution Explorer
-         */
-         
-        IStream connection;
         RemoteDevice arduino;
+        DispatcherTimer timer;
+        PinState currentState;
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            if( useBluetooth )
-            {
-                /*
-                 * I've written my bluetooth device name as a parameter to the BluetoothSerial constructor. You should change this to your previously-paired
-                 * device name if using Bluetooth. You can also use the BluetoothSerial.listAvailableDevicesAsync() function to list
-                 * available devices, but that is not covered in this basic sample.
-                 */
-                connection = new BluetoothSerial( "RNBT-E072" );
-            }
-            else
-            {
-                /*
-                 * I've written my Arduino device VID and PID as a parameter to the BluetoothSerial constructor. You should change this to your 
-                 * device VID and PID if using USB. You can also use the UsbSerial.listAvailableDevicesAsync() function to list
-                 * available devices, but that is not covered in this basic sample.
-                 */
-                connection = new UsbSerial( "VID_2341", "PID_0043" );   //I've written in my device D directly
-            }
+            arduino = App.Arduino;
+            App.Telemetry.TrackEvent( "RemoteBlinky_Windows10_SuccessfullyConnected" );
 
+            App.Arduino.DeviceConnectionLost += Arduino_OnDeviceConnectionLost;
 
-            arduino = new RemoteDevice( connection );
-            connection.ConnectionEstablished += OnConnectionEstablished;
-            connection.ConnectionFailed += OnConnectionFailed;
-
-            //These parameters don't matter for Bluetooth, but SerialConfig.8N1 is the default config for Arduino devices over USB
-            connection.begin( 115200, SerialConfig.SERIAL_8N1 );
+            currentState = PinState.LOW;
+            OnButton.IsEnabled = true;
+            OffButton.IsEnabled = true;
+            BlinkButton.IsEnabled = true;
         }
 
-        private void OnConnectionFailed( string message )
+        private void Arduino_OnDeviceConnectionLost( string message )
         {
-            ConnectMessage.Text = "Connection Failed.";
-        }
+            ConnectionStatusMessage.Text = "Your device connection was lost!";
+            
+            if( timer != null )
+            {
+                timer.Stop();
+                timer = null;
+            }
 
-        private void OnConnectionEstablished()
-        {
-            //enable the buttons on the UI thread!
-            var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () => {
-                OnButton.IsEnabled = true;
-                OffButton.IsEnabled = true;
-            } ) );
+            OnButton.IsEnabled = false;
+            OffButton.IsEnabled = false;
+            BlinkButton.IsEnabled = false;
         }
 
         private void OnButton_Click( object sender, RoutedEventArgs e )
         {
             //turn the LED connected to pin 13 ON
-            arduino.digitalWrite( 13, PinState.HIGH );
+            currentState = PinState.HIGH;
+            arduino.digitalWrite( 13, currentState );
         }
 
         private void OffButton_Click( object sender, RoutedEventArgs e )
         {
             //turn the LED connected to pin 13 OFF
-            arduino.digitalWrite( 13, PinState.LOW );
+            currentState = PinState.LOW;
+            arduino.digitalWrite( 13, currentState );
+        }
+
+        private void ToggleButton_Click( object sender, RoutedEventArgs e )
+        {
+            if( timer == null )
+            {
+                timer = new DispatcherTimer();
+                timer.Interval = TimeSpan.FromMilliseconds( 500 );
+                timer.Tick += ToggleLed;
+                timer.Start();
+                BlinkButton.Content = "Stop Blinking!";
+            }
+            else
+            {
+                timer.Stop();
+                timer = null;
+                var obj = BlinkButton.Content as TextBlock;
+                BlinkButton.Content = "Blink!";
+            }
+        }
+
+        private void ToggleLed( object sender, object e )
+        {
+            currentState = ( currentState == PinState.LOW ? PinState.HIGH : PinState.LOW );
+            arduino.digitalWrite( 13, currentState );
         }
     }
 }

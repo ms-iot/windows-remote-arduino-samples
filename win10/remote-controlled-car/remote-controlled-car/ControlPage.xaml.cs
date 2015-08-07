@@ -65,6 +65,8 @@ namespace remote_controlled_car
         {
             this.InitializeComponent();
 
+            App.Telemetry.TrackPageView( "RC_Car_ControlPage" );
+
             turn = Turn.none;
             direction = Direction.none;
 
@@ -216,6 +218,7 @@ namespace remote_controlled_car
                 accelerometer.ReportInterval = 100;
                 accelerometer.ReadingChanged += Accelerometer_ReadingChanged;
             }
+            App.Telemetry.TrackEvent( "RC_Car_StartDrivingButtonPressed" );
         }
 
         private void stopButton_Click( object sender, RoutedEventArgs e )
@@ -228,11 +231,13 @@ namespace remote_controlled_car
             direction = Direction.none;
             arduino.analogWrite( FB_MOTOR_CONTROL_PIN, 0 );
             arduino.digitalWrite( LR_MOTOR_CONTROL_PIN, PinState.LOW );
+            App.Telemetry.TrackEvent( "RC_Car_StopDrivingButtonPressed" );
         }
 
         private void disconnectButton_Click( object sender, RoutedEventArgs e )
         {
             stopAndReturn();
+            App.Telemetry.TrackEvent( "RC_Car_DisconnectButtonPressed" );
         }
 
         private void UpdateUI( AccelerometerReading reading )

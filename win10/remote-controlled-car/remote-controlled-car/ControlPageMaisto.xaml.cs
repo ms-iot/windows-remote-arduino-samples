@@ -63,6 +63,8 @@ namespace remote_controlled_car
             turn = Turn.none;
             direction = Direction.none;
 
+            App.Telemetry.TrackPageView( "RC_Car_ControlPageMaisto" );
+
             accelerometer = App.Accelerometer;
             bluetooth = App.Bluetooth;
             arduino = App.Arduino;
@@ -197,6 +199,7 @@ namespace remote_controlled_car
                 accelerometer.ReportInterval = 100;
                 accelerometer.ReadingChanged += Accelerometer_ReadingChanged;
             }
+            App.Telemetry.TrackEvent( "RC_Car_StartDrivingButtonPressed" );
         }
 
         private void stopButton_Click( object sender, RoutedEventArgs e )
@@ -211,11 +214,13 @@ namespace remote_controlled_car
             arduino.digitalWrite( RIGHT_CONTROL_PIN, PinState.LOW );
             arduino.digitalWrite( FORWARD_CONTROL_PIN, PinState.LOW );
             arduino.digitalWrite( REVERSE_CONTROL_PIN, PinState.LOW );
+            App.Telemetry.TrackEvent( "RC_Car_StopDrivingButtonPressed" );
         }
 
         private void disconnectButton_Click( object sender, RoutedEventArgs e )
         {
             stopAndReturn();
+            App.Telemetry.TrackEvent( "RC_Car_DisconnectButtonPressed" );
         }
 
         private void UpdateUI( AccelerometerReading reading )

@@ -7,6 +7,7 @@ using Windows.UI.Xaml.Navigation;
 using Communication;
 using Microsoft.Maker.Serial;
 using Microsoft.Maker.RemoteWiring;
+using System.Collections.Generic;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -18,17 +19,20 @@ namespace remote_controlled_car
     public sealed partial class MainPage : Page
     {
         private Connections _connections = null;
+        DateTime connectionAttemptStartedTime;
 
         public MainPage()
         {
             this.InitializeComponent();
 
+            App.Telemetry.TrackPageView( "RC_Car_MainPage" );
             App.Accelerometer = Accelerometer.GetDefault();
             if( App.Accelerometer == null )
             {
                 // The device on which the application is running does not support
                 // the accelerometer sensor. Alert the user and disable the
                 // Start and Stop buttons.
+                App.Telemetry.TrackEvent( "RC_Car_NoAccelerometer" );
                 mTextBlock.Text = "device does not support accelerometer";
                 setButtonsEnabled( false );
             }
@@ -76,33 +80,48 @@ namespace remote_controlled_car
                 var selectedConnection = connectList.SelectedItem as Connection;
                 var device = selectedConnection.Source as DeviceInformation;
 
+                //send telemetry about this connection attempt
+                var properties = new Dictionary<string, string>();
+                properties.Add( "Device_Name", device.Name );
+                properties.Add( "Device_ID", device.Id );
+                properties.Add( "Device_Kind", device.Kind.ToString() );
+                App.Telemetry.TrackEvent( "RC_Car_Bluetooth_Connection_Attempt", properties );
+
                 //construct the bluetooth serial object with the specified device
                 App.Bluetooth = new BluetoothSerial( device );
-
-                App.Bluetooth.ConnectionEstablished += Bluetooth_ConnectionEstablished;
-                App.Bluetooth.ConnectionFailed += Bluetooth_ConnectionFailed;
                 App.Arduino = new RemoteDevice( App.Bluetooth );
+
+                App.Arduino.DeviceReady += Arduino_OnDeviceReady;
+                App.Arduino.DeviceConnectionFailed += Arduino_OnDeviceConnectionFailed;
+
+                connectionAttemptStartedTime = DateTime.Now;
                 App.Bluetooth.begin( 115200, 0 );
             }
         }
 
-        private void Bluetooth_ConnectionFailed( string message )
+        private void Arduino_OnDeviceConnectionFailed( string message )
         {
-            App.Bluetooth.ConnectionEstablished -= Bluetooth_ConnectionEstablished;
-            App.Bluetooth.ConnectionFailed -= Bluetooth_ConnectionFailed;
+            App.Bluetooth.ConnectionEstablished -= Arduino_OnDeviceReady;
+            App.Bluetooth.ConnectionFailed -= Arduino_OnDeviceConnectionFailed;
             var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
             {
                 setButtonsEnabled( true );
                 mTextBlock.Text = "Connection failed.";
+
+                //telemetry
+                App.Telemetry.TrackRequest( "Connection_Failed_Event", DateTimeOffset.Now, DateTime.Now - connectionAttemptStartedTime, message, true );
             } ) );
         }
 
-        private void Bluetooth_ConnectionEstablished()
+        private void Arduino_OnDeviceReady()
         {
-            App.Bluetooth.ConnectionEstablished -= Bluetooth_ConnectionEstablished;
-            App.Bluetooth.ConnectionFailed -= Bluetooth_ConnectionFailed;
+            App.Bluetooth.ConnectionEstablished -= Arduino_OnDeviceReady;
+            App.Bluetooth.ConnectionFailed -= Arduino_OnDeviceConnectionFailed;
             var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
             {
+                //telemetry
+                App.Telemetry.TrackRequest( "RC_Car_Connection_Success_Event", DateTimeOffset.Now, DateTime.Now - connectionAttemptStartedTime, string.Empty, true );
+
                 Frame.Navigate( typeof( ControlPage ) );
             } ) );
         }

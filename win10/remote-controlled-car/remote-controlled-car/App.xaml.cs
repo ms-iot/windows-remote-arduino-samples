@@ -7,6 +7,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Microsoft.Maker.Serial;
 using Microsoft.Maker.RemoteWiring;
+using Microsoft.ApplicationInsights;
 
 namespace remote_controlled_car
 {
@@ -33,6 +34,12 @@ namespace remote_controlled_car
             set;
         }
 
+        public static TelemetryClient Telemetry
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -44,6 +51,8 @@ namespace remote_controlled_car
                 Microsoft.ApplicationInsights.WindowsCollectors.Session );
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            Telemetry = new TelemetryClient();
         }
 
         /// <summary>

@@ -12,6 +12,9 @@ namespace RemoteBlinky
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        //we will toggle the state of pin 13 by default
+        private const byte PIN_NUMBER = 13;
+
         RemoteDevice arduino;
         DispatcherTimer timer;
         PinState currentState;
@@ -48,16 +51,16 @@ namespace RemoteBlinky
 
         private void OnButton_Click( object sender, RoutedEventArgs e )
         {
-            //turn the LED connected to pin 13 ON
+            //turn the LED connected to pin PIN_NUMBER ON
             currentState = PinState.HIGH;
-            arduino.digitalWrite( 13, currentState );
+            arduino.digitalWrite( PIN_NUMBER, currentState );
         }
 
         private void OffButton_Click( object sender, RoutedEventArgs e )
         {
-            //turn the LED connected to pin 13 OFF
+            //turn the LED connected to pin PIN_NUMBER OFF
             currentState = PinState.LOW;
-            arduino.digitalWrite( 13, currentState );
+            arduino.digitalWrite( PIN_NUMBER, currentState );
         }
 
         private void ToggleButton_Click( object sender, RoutedEventArgs e )
@@ -82,7 +85,7 @@ namespace RemoteBlinky
         private void ToggleLed( object sender, object e )
         {
             currentState = ( currentState == PinState.LOW ? PinState.HIGH : PinState.LOW );
-            arduino.digitalWrite( 13, currentState );
+            arduino.digitalWrite( PIN_NUMBER, currentState );
         }
     }
 }

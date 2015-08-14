@@ -25,6 +25,11 @@ namespace RemoteBlinky
         DateTime timePageNavigatedTo;
         CancellationTokenSource cancelTokenSource;
 
+        //string identifiers used to recognize drop-down selections
+        private const string BLUETOOTH = "Bluetooth";
+        private const string USB = "USB";
+        private const string NETWORK = "Network";
+
         public ConnectionPage()
         {
             this.InitializeComponent();
@@ -38,7 +43,7 @@ namespace RemoteBlinky
 
             //telemetry
             App.Telemetry.TrackPageView( "Connection_Page" );
-            timePageNavigatedTo = DateTime.Now;
+            timePageNavigatedTo = DateTime.UtcNow;
 
             if( ConnectionList.ItemsSource == null )
             {
@@ -60,9 +65,10 @@ namespace RemoteBlinky
             switch( ConnectionMethodComboBox.SelectedItem as String )
             {
                 default:
-                case "Bluetooth":
+                case BLUETOOTH:
                     ConnectionList.Visibility = Visibility.Visible;
                     NetworkConnectionGrid.Visibility = Visibility.Collapsed;
+                    BaudRateStack.Visibility = Visibility.Visible;
 
                     //create a cancellation token which can be used to cancel a task
                     cancelTokenSource = new CancellationTokenSource();
@@ -71,9 +77,10 @@ namespace RemoteBlinky
                     task = BluetoothSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>( cancelTokenSource.Token );
                     break;
 
-                case "USB":
+                case USB:
                     ConnectionList.Visibility = Visibility.Visible;
                     NetworkConnectionGrid.Visibility = Visibility.Collapsed;
+                    BaudRateStack.Visibility = Visibility.Visible;
 
                     //create a cancellation token which can be used to cancel a task
                     cancelTokenSource = new CancellationTokenSource();
@@ -82,14 +89,18 @@ namespace RemoteBlinky
                     task = UsbSerial.listAvailableDevicesAsync().AsTask<DeviceInformationCollection>( cancelTokenSource.Token );
                     break;
 
-                case "Network":
+                case NETWORK:
                     ConnectionList.Visibility = Visibility.Collapsed;
                     NetworkConnectionGrid.Visibility = Visibility.Visible;
+                    BaudRateStack.Visibility = Visibility.Collapsed;
+
                     ConnectMessage.Text = "Enter a host and port to connect";
                     task = null;
                     break;
             }
 
+
+            //the task, if created, is enumerating the devices available from the selected connection method. We will display the results to the UI so that they can be selected.
             if( task != null )
             {
                 //store the returned DeviceInformation items when the task completes
@@ -170,13 +181,16 @@ namespace RemoteBlinky
                 var selectedConnection = ConnectionList.SelectedItem as Connection;
                 device = selectedConnection.Source as DeviceInformation;
             }
-            else if( ( ConnectionMethodComboBox.SelectedItem as string ) != "Network" )
+            else if( ( ConnectionMethodComboBox.SelectedItem as string ) != NETWORK )
             {
                 //if they haven't selected an item, but have chosen "usb" or "bluetooth", we can't proceed
                 ConnectMessage.Text = "You must select an item to proceed.";
                 SetUiEnabled( true );
                 return;
             }
+
+            //determine the selected baud rate
+            uint baudRate = Convert.ToUInt32( ( BaudRateComboBox.SelectedItem as string ) );
 
             //connection properties dictionary, used only for telemetry data
             var properties = new Dictionary<string, string>();
@@ -185,7 +199,7 @@ namespace RemoteBlinky
             switch( ConnectionMethodComboBox.SelectedItem as string )
             {
                 default:
-                case "Bluetooth":
+                case BLUETOOTH:
 
                     //send telemetry about this connection attempt
                     properties.Add( "Device_Name", device.Name );
@@ -195,7 +209,7 @@ namespace RemoteBlinky
                     App.Connection = new BluetoothSerial( device );
                     break;
 
-                case "USB":
+                case USB:
 
                     //send telemetry about this connection attempt
                     properties.Add( "Device_Name", device.Name );
@@ -206,7 +220,7 @@ namespace RemoteBlinky
                     App.Connection = new UsbSerial( device );
                     break;
 
-                case "Network":
+                case NETWORK:
                     string host = NetworkHostNameTextBox.Text;
                     string port = NetworkPortTextBox.Text;
                     ushort portnum = 0;
@@ -237,11 +251,11 @@ namespace RemoteBlinky
             }
 
             App.Arduino = new RemoteDevice( App.Connection );
-            App.Arduino.DeviceReady += OnConnectionEstablished;
-            App.Arduino.DeviceConnectionFailed += OnConnectionFailed;
+            App.Arduino.DeviceReady += OnDeviceReady;
+            App.Arduino.DeviceConnectionFailed += OnDeviceConnectionFailed;
 
-            connectionAttemptStartedTime = DateTime.Now;
-            App.Connection.begin( 115200, SerialConfig.SERIAL_8N1 );
+            connectionAttemptStartedTime = DateTime.UtcNow;
+            App.Connection.begin( baudRate, SerialConfig.SERIAL_8N1 );
 
             //start a timer for connection timeout
             timeout = new DispatcherTimer();
@@ -255,29 +269,29 @@ namespace RemoteBlinky
          *                  Event callbacks                             *
          ****************************************************************/
 
-        private void OnConnectionFailed( string message )
+        private void OnDeviceConnectionFailed( string message )
         {
             var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
             {
                 timeout.Stop();
 
                 //telemetry
-                App.Telemetry.TrackRequest( "Connection_Failed_Event", DateTimeOffset.Now, DateTime.Now - connectionAttemptStartedTime, message, true );
+                App.Telemetry.TrackRequest( "Connection_Failed_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, message, true );
 
                 ConnectMessage.Text = "Connection attempt failed: " + message;
                 SetUiEnabled( true );
             } ) );
         }
 
-        private void OnConnectionEstablished()
+        private void OnDeviceReady()
         {
             var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () =>
             {
                 timeout.Stop();
                 
                 //telemetry
-                App.Telemetry.TrackRequest( "Connection_Success_Event", DateTimeOffset.Now, DateTime.Now - connectionAttemptStartedTime, string.Empty, true );
-                App.Telemetry.TrackMetric( "Connection_Page_Time_Spent_In_Seconds", ( DateTime.Now - timePageNavigatedTo ).TotalSeconds );
+                App.Telemetry.TrackRequest( "Connection_Success_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true );
+                App.Telemetry.TrackMetric( "Connection_Page_Time_Spent_In_Seconds", ( DateTime.UtcNow - timePageNavigatedTo ).TotalSeconds );
 
                 this.Frame.Navigate( typeof( MainPage ) );
             } ) );
@@ -290,7 +304,7 @@ namespace RemoteBlinky
                 timeout.Stop();
 
                 //telemetry
-                App.Telemetry.TrackRequest( "Connection_Timeout_Event", DateTimeOffset.Now, DateTime.Now - connectionAttemptStartedTime, string.Empty, true );
+                App.Telemetry.TrackRequest( "Connection_Timeout_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true );
 
                 ConnectMessage.Text = "Connection attempt timed out.";
                 SetUiEnabled( true );
@@ -315,12 +329,12 @@ namespace RemoteBlinky
         private void OnConnectionCancelled()
         {
             ConnectMessage.Text = "Connection attempt cancelled.";
-            App.Telemetry.TrackRequest( "Connection_Cancelled_Event", DateTimeOffset.Now, DateTime.Now - connectionAttemptStartedTime, string.Empty, true );
+            App.Telemetry.TrackRequest( "Connection_Cancelled_Event", DateTimeOffset.UtcNow, DateTime.UtcNow - connectionAttemptStartedTime, string.Empty, true );
 
             if( App.Connection != null )
             {
-                App.Connection.ConnectionEstablished -= OnConnectionEstablished;
-                App.Connection.ConnectionFailed -= OnConnectionFailed;
+                App.Connection.ConnectionEstablished -= OnDeviceReady;
+                App.Connection.ConnectionFailed -= OnDeviceConnectionFailed;
             }
 
             if( cancelTokenSource != null )

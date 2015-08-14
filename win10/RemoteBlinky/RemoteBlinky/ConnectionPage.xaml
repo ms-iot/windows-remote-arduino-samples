@@ -17,11 +17,29 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="10,10,0,0" x:Name="ConnectSelection" Orientation="Vertical">
-            <ComboBox x:Name="ConnectionMethodComboBox" Width="auto" SelectedIndex="0">
-                <x:String>Bluetooth</x:String>
-                <x:String>USB</x:String>
-                <x:String>Network</x:String>
-            </ComboBox>
+            <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <StackPanel Margin="0,0,20,0" Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Connection Method:" />
+                    <ComboBox x:Name="ConnectionMethodComboBox" HorizontalAlignment="Stretch" SelectedIndex="0">
+                        <x:String>Bluetooth</x:String>
+                        <x:String>USB</x:String>
+                        <x:String>Network</x:String>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel x:Name="BaudRateStack" Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <TextBlock Text="Baud Rate:" />
+                    <ComboBox x:Name="BaudRateComboBox" HorizontalAlignment="Stretch" SelectedIndex="6">
+                        <x:String>300</x:String>
+                        <x:String>1200</x:String>
+                        <x:String>2400</x:String>
+                        <x:String>4800</x:String>
+                        <x:String>19200</x:String>
+                        <x:String>38400</x:String>
+                        <x:String>57600</x:String>
+                        <x:String>115200</x:String>
+                    </ComboBox>
+                </StackPanel>
+        </StackPanel>
         </StackPanel>
         <StackPanel Grid.Row="1" Margin="10,0,10,0" x:Name="ConnectStackParent" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center">
             <ListBox x:Name="ConnectionList" DisplayMemberPath="DisplayName" />

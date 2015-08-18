@@ -7,11 +7,11 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="b120e693-8470-408a-8839-6dfd28d26ed4"
+    Name="f999dfbd-15b5-4203-ad99-b496cc75f4b5"
     Publisher="CN=jessefr"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="b120e693-8470-408a-8839-6dfd28d26ed4" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="f999dfbd-15b5-4203-ad99-b496cc75f4b5" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>RemoteBlinky</DisplayName>
@@ -20,7 +20,7 @@
   </Properties>
 
   <Dependencies>
-    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.10042.0" MaxVersionTested="10.0.10069.0" />
+    <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
   </Dependencies>
 
   <Resources>
@@ -33,30 +33,29 @@
       EntryPoint="RemoteBlinky.App">
       <uap:VisualElements
         DisplayName="RemoteBlinky"
-        Square150x150Logo="Assets\Logo.png"
-        Square44x44Logo="Assets\SmallLogo.png"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png"
         Description="RemoteBlinky"
-        BackgroundColor="#464646">
+        BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
     </Application>
   </Applications>
 
   <Capabilities>
-    <Capability Name="internetClient" />
-    <DeviceCapability Name="bluetooth.rfcomm">
-      <Device Id="any">
-        <Function Type="name:serialPort"/>
-      </Device>
-    </DeviceCapability>
-    
-    <!-- remove the below DeviceCapability tag if deploying to Windows Phone -->
-    <DeviceCapability Name="serialcommunication">
-      <Device Id="any">
-        <Function Type="name:serialPort"/>
-      </Device>
-    </DeviceCapability>
-    <!-- end tag to remove -->  
-
+      <Capability Name="internetClient" />
+      <Capability Name="privateNetworkClientServer"/>
+      <Capability Name="internetClientServer"/>
+      <DeviceCapability Name="bluetooth.rfcomm">
+          <Device Id="any">
+              <Function Type="name:serialPort" />
+          </Device>
+      </DeviceCapability>
+      <DeviceCapability Name="serialcommunication">
+          <Device Id="any">
+              <Function Type="name:serialPort" />
+          </Device>
+      </DeviceCapability>
   </Capabilities>
 </Package>

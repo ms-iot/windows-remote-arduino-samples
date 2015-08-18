@@ -1,21 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=402347&clcid=0x409
+using Microsoft.Maker.RemoteWiring;
+using Microsoft.Maker.Serial;
+using Microsoft.ApplicationInsights;
 
 namespace RemoteBlinky
 {
@@ -24,10 +15,23 @@ namespace RemoteBlinky
     /// </summary>
     sealed partial class App : Application
     {
-        /// <summary>
-        /// Allows tracking page views, exceptions and other telemetry through the Microsoft Application Insights service.
-        /// </summary>
-        public static Microsoft.ApplicationInsights.TelemetryClient TelemetryClient;
+        public static IStream Connection
+        {
+            get;
+            set;
+        }
+
+        public static RemoteDevice Arduino
+        {
+            get;
+            set;
+        }
+
+        public static TelemetryClient Telemetry
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -35,10 +39,13 @@ namespace RemoteBlinky
         /// </summary>
         public App()
         {
-            TelemetryClient = new Microsoft.ApplicationInsights.TelemetryClient();
-
+            Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
+                Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
+                Microsoft.ApplicationInsights.WindowsCollectors.Session );
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            Telemetry = new TelemetryClient();
         }
 
         /// <summary>
@@ -81,7 +88,7 @@ namespace RemoteBlinky
                 // When the navigation stack isn't restored navigate to the first page,
                 // configuring the new page by passing required information as a navigation
                 // parameter
-                rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                rootFrame.Navigate(typeof(ConnectionPage), e.Arguments);
             }
             // Ensure the current window is active
             Window.Current.Activate();

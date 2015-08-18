@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using Microsoft.Maker.Serial;
 using Microsoft.Maker.RemoteWiring;
+using System;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -24,77 +12,80 @@ namespace RemoteBlinky
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private bool useBluetooth = true;
-        /*
-         * select one of the following connection types, Bluetooth or USB. This solution contains code for both, but you should only use one at a time.
-         *  to select one, set the boolean property above to TRUE to use bluetooth, or leave FALSE to use USB.
-         *
-         * If using Bluetooth + Windows Phone, you will need to remove the "USB" capability from this solution.
-         *   - See the <DeviceCapabilities> near the bottom of the .appxmanifest file, which you can find in the Solution Explorer
-         */
-        
-        //only one of these will be used, depending on the useBluetooth property above.
-        BluetoothSerial bluetooth;
-        UsbSerial usb;
-        
+        //we will toggle the state of pin 13 by default
+        private const byte PIN_NUMBER = 13;
+
         RemoteDevice arduino;
+        DispatcherTimer timer;
+        PinState currentState;
 
         public MainPage()
         {
             this.InitializeComponent();
 
-            if( useBluetooth )
-            {
-                /*
-                 * I've written my bluetooth device name as a parameter to the BluetoothSerial constructor. You should change this to your previously-paired
-                 * device name if using Bluetooth. You can also use the BluetoothSerial.listAvailableDevicesAsync() function to list
-                 * available devices, but that is not covered in this sample.
-                 */
-                bluetooth = new BluetoothSerial( "RNBT-E072" );
+            arduino = App.Arduino;
+            App.Telemetry.TrackEvent( "RemoteBlinky_Windows10_SuccessfullyConnected" );
 
-                arduino = new RemoteDevice( bluetooth );
-                bluetooth.ConnectionEstablished += OnConnectionEstablished;
+            App.Arduino.DeviceConnectionLost += Arduino_OnDeviceConnectionLost;
 
-                //these parameters don't matter for bluetooth
-                bluetooth.begin( 0, 0 );
-            }
-            else
-            {
-                /*
-                 * I've written my Arduino device VID and PID as a parameter to the BluetoothSerial constructor. You should change this to your 
-                 * device VID and PID if using USB. You can also use the UsbSerial.listAvailableDevicesAsync() function to list
-                 * available devices, but that is not covered in this sample.
-                 */
-                usb = new UsbSerial( "VID_2341", "PID_0043" );   //I've written in my device D directly
-                
-                arduino = new RemoteDevice( usb );
-                usb.ConnectionEstablished += OnConnectionEstablished;
-
-                //SerialConfig.8N1 is the default config for Arduino devices over USB
-                usb.begin( 115200, SerialConfig.SERIAL_8N1 );
-            }
-
+            currentState = PinState.LOW;
+            OnButton.IsEnabled = true;
+            OffButton.IsEnabled = true;
+            BlinkButton.IsEnabled = true;
         }
 
-        private void OnConnectionEstablished()
+        private void Arduino_OnDeviceConnectionLost( string message )
         {
-            //enable the buttons on the UI thread!
-            var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () => {
-                OnButton.IsEnabled = true;
-                OffButton.IsEnabled = true;
-            }));
+            ConnectionStatusMessage.Text = "Your device connection was lost!";
+            
+            if( timer != null )
+            {
+                timer.Stop();
+                timer = null;
+            }
+
+            OnButton.IsEnabled = false;
+            OffButton.IsEnabled = false;
+            BlinkButton.IsEnabled = false;
         }
 
         private void OnButton_Click( object sender, RoutedEventArgs e )
         {
-            //turn the LED connected to pin 5 ON
-            arduino.digitalWrite( 5, PinState.HIGH );
+            //turn the LED connected to pin PIN_NUMBER ON
+            currentState = PinState.HIGH;
+            arduino.digitalWrite( PIN_NUMBER, currentState );
         }
 
         private void OffButton_Click( object sender, RoutedEventArgs e )
         {
-            //turn the LED connected to pin 5 OFF
-            arduino.digitalWrite( 5, PinState.LOW );
+            //turn the LED connected to pin PIN_NUMBER OFF
+            currentState = PinState.LOW;
+            arduino.digitalWrite( PIN_NUMBER, currentState );
+        }
+
+        private void ToggleButton_Click( object sender, RoutedEventArgs e )
+        {
+            if( timer == null )
+            {
+                timer = new DispatcherTimer();
+                timer.Interval = TimeSpan.FromMilliseconds( 500 );
+                timer.Tick += ToggleLed;
+                timer.Start();
+                BlinkButton.Content = "Stop Blinking!";
+            }
+            else
+            {
+                timer.Stop();
+                timer = null;
+                var obj = BlinkButton.Content as TextBlock;
+                BlinkButton.Content = "Blink!";
+            }
+        }
+
+        private void ToggleLed( object sender, object e )
+        {
+            currentState = ( currentState == PinState.LOW ? PinState.HIGH : PinState.LOW );
+            arduino.digitalWrite( PIN_NUMBER, currentState );
         }
     }
 }

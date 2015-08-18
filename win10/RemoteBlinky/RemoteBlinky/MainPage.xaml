@@ -5,15 +5,21 @@
     xmlns:local="using:RemoteBlinky"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Background="Black"
+    Background="SlateGray"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Button Name="OnButton" Click="OnButton_Click" Grid.Row="0" IsEnabled="False" HorizontalAlignment="Stretch">On!</Button>
-        <Button Name="OffButton" Click="OffButton_Click" Grid.Row="1" IsEnabled="False" HorizontalAlignment="Stretch">Off!</Button>
+        <TextBlock Name="WelcomeMessage" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="0" FontSize="20" Text="Welcome to RemoteBlinky!"/>
+        <TextBlock Name="ConnectionStatusMessage" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1" FontSize="12" Text="Your device is connected."/>
+        <Button Name="OnButton" Click="OnButton_Click" Margin="10" Grid.Row="2" IsEnabled="False" HorizontalAlignment="Stretch">On!</Button>
+        <Button Name="OffButton" Click="OffButton_Click" Margin="10" Grid.Row="3" IsEnabled="False" HorizontalAlignment="Stretch">Off!</Button>
+        <Button Name="BlinkButton" Click="ToggleButton_Click" Margin="10" Grid.Row="4" IsEnabled="False" HorizontalAlignment="Stretch">Blink!</Button>
     </Grid>
 </Page>

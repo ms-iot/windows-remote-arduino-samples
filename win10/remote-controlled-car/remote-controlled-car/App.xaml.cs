@@ -1,14 +1,13 @@
-﻿using Microsoft.Maker.RemoteWiring;
-using Microsoft.Maker.Serial;
-using System;
+﻿using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Devices.Sensors;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-
-// The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=402347&clcid=0x409
+using Microsoft.Maker.Serial;
+using Microsoft.Maker.RemoteWiring;
+using Microsoft.ApplicationInsights;
 
 namespace remote_controlled_car
 {
@@ -17,9 +16,29 @@ namespace remote_controlled_car
     /// </summary>
     sealed partial class App : Application
     {
-        public static Accelerometer accelerometer;
-        public static BluetoothSerial bluetooth;
-        public static RemoteDevice arduino;
+        public static Accelerometer Accelerometer
+        {
+            get;
+            set;
+        }
+
+        public static IStream Bluetooth
+        {
+            get;
+            set;
+        }
+
+        public static RemoteDevice Arduino
+        {
+            get;
+            set;
+        }
+
+        public static TelemetryClient Telemetry
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -27,8 +46,13 @@ namespace remote_controlled_car
         /// </summary>
         public App()
         {
+            Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
+                Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
+                Microsoft.ApplicationInsights.WindowsCollectors.Session );
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            Telemetry = new TelemetryClient();
         }
 
         /// <summary>

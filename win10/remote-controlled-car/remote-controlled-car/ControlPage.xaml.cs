@@ -34,7 +34,7 @@ namespace remote_controlled_car
         }
 
         private const double LR_MAG = 0.4;
-        private const double FB_MAG = 0.5;
+        private const double FB_MAG = 0.4;
         private const double MAX_ANALOG_VALUE = 255.0;
 
         /*
@@ -56,7 +56,7 @@ namespace remote_controlled_car
 
         private DisplayRequest keepScreenOnRequest;
         private Accelerometer accelerometer;
-        private BluetoothSerial bluetooth;
+        private IStream bluetooth;
         private RemoteDevice arduino;
         private Turn turn;
         private Direction direction;
@@ -65,12 +65,14 @@ namespace remote_controlled_car
         {
             this.InitializeComponent();
 
+            App.Telemetry.TrackPageView( "RC_Car_ControlPage" );
+
             turn = Turn.none;
             direction = Direction.none;
 
-            accelerometer = App.accelerometer;
-            bluetooth = App.bluetooth;
-            arduino = App.arduino;
+            accelerometer = App.Accelerometer;
+            bluetooth = App.Bluetooth;
+            arduino = App.Arduino;
 
             if( accelerometer == null || bluetooth == null || arduino == null )
             {
@@ -87,13 +89,13 @@ namespace remote_controlled_car
             keepScreenOnRequest = new DisplayRequest();
             keepScreenOnRequest.RequestActive();
 
-            App.arduino.pinMode( LR_DIRECTION_CONTROL_PIN, PinMode.OUTPUT );
-            App.arduino.pinMode( FB_DIRECTION_CONTROL_PIN, PinMode.OUTPUT );
-            App.arduino.pinMode( LR_MOTOR_CONTROL_PIN, PinMode.PWM );
-            App.arduino.pinMode( FB_MOTOR_CONTROL_PIN, PinMode.PWM );
+            App.Arduino.pinMode( LR_DIRECTION_CONTROL_PIN, PinMode.OUTPUT );
+            App.Arduino.pinMode( FB_DIRECTION_CONTROL_PIN, PinMode.OUTPUT );
+            App.Arduino.pinMode( LR_MOTOR_CONTROL_PIN, PinMode.PWM );
+            App.Arduino.pinMode( FB_MOTOR_CONTROL_PIN, PinMode.PWM );
         }
 
-        private void Bluetooth_ConnectionLost()
+        private void Bluetooth_ConnectionLost( string message )
         {
             stopAndReturn();
         }
@@ -102,9 +104,9 @@ namespace remote_controlled_car
         {
             var action = Dispatcher.RunAsync( Windows.UI.Core.CoreDispatcherPriority.Normal, new Windows.UI.Core.DispatchedHandler( () => UpdateUI( accel.Reading ) ) );
 
-            //X is the left/right tilt, while Y is the fwd/rev tilt
-            double lr = accel.Reading.AccelerationX;
-            double fb = accel.Reading.AccelerationY;
+            //Y is the left/right tilt, while X is the fwd/rev tilt
+            double lr = -accel.Reading.AccelerationY;
+            double fb = accel.Reading.AccelerationX;
 
             handleTurn( lr );
             handleDirection( fb );
@@ -216,6 +218,7 @@ namespace remote_controlled_car
                 accelerometer.ReportInterval = 100;
                 accelerometer.ReadingChanged += Accelerometer_ReadingChanged;
             }
+            App.Telemetry.TrackEvent( "RC_Car_StartDrivingButtonPressed" );
         }
 
         private void stopButton_Click( object sender, RoutedEventArgs e )
@@ -228,11 +231,13 @@ namespace remote_controlled_car
             direction = Direction.none;
             arduino.analogWrite( FB_MOTOR_CONTROL_PIN, 0 );
             arduino.digitalWrite( LR_MOTOR_CONTROL_PIN, PinState.LOW );
+            App.Telemetry.TrackEvent( "RC_Car_StopDrivingButtonPressed" );
         }
 
         private void disconnectButton_Click( object sender, RoutedEventArgs e )
         {
             stopAndReturn();
+            App.Telemetry.TrackEvent( "RC_Car_DisconnectButtonPressed" );
         }
 
         private void UpdateUI( AccelerometerReading reading )
@@ -252,9 +257,9 @@ namespace remote_controlled_car
         private void stopAndReturn()
         {
             stopButton_Click( null, null );
-            App.bluetooth.end();
-            App.bluetooth = null;
-            App.arduino = null;
+            App.Bluetooth.end();
+            App.Bluetooth = null;
+            App.Arduino = null;
             Frame.Navigate( typeof( MainPage ) );
         }
     }

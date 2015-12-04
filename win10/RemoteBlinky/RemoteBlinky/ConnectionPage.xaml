@@ -28,11 +28,12 @@
                 </StackPanel>
                 <StackPanel x:Name="BaudRateStack" Orientation="Vertical" HorizontalAlignment="Stretch">
                     <TextBlock Text="Baud Rate:" />
-                    <ComboBox x:Name="BaudRateComboBox" HorizontalAlignment="Stretch" SelectedIndex="6">
+                    <ComboBox x:Name="BaudRateComboBox" HorizontalAlignment="Stretch" SelectedIndex="7">
                         <x:String>300</x:String>
                         <x:String>1200</x:String>
                         <x:String>2400</x:String>
                         <x:String>4800</x:String>
+                        <x:String>9600</x:String>
                         <x:String>19200</x:String>
                         <x:String>38400</x:String>
                         <x:String>57600</x:String>

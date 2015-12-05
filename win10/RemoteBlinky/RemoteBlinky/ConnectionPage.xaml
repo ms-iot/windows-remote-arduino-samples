@@ -59,7 +59,7 @@
 
         <StackPanel Grid.Row="3" Margin="10" Orientation="Horizontal" FlowDirection="RightToLeft" >
             <Button x:Uid="Connect" Margin="0,0,10,0" x:Name="ConnectButton" Click="ConnectButton_Click">Connect</Button>
-            <Button x:Uid="Connect" Margin="0,0,10,0" x:Name="CancelButton" Click="CancelButton_Click" IsEnabled="False">Cancel</Button>
+            <Button x:Uid="Cancel" Margin="0,0,10,0" x:Name="CancelButton" Click="CancelButton_Click" IsEnabled="False">Cancel</Button>
             <Button x:Uid="RefreshBtn" Margin="0,0,10,0" x:Name="RefreshButton" Click="RefreshButton_Click">Refresh</Button>
         </StackPanel>
     </Grid>

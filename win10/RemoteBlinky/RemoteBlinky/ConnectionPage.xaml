@@ -28,11 +28,12 @@
                 </StackPanel>
                 <StackPanel x:Name="BaudRateStack" Orientation="Vertical" HorizontalAlignment="Stretch">
                     <TextBlock Text="Baud Rate:" />
-                    <ComboBox x:Name="BaudRateComboBox" HorizontalAlignment="Stretch" SelectedIndex="6">
+                    <ComboBox x:Name="BaudRateComboBox" HorizontalAlignment="Stretch" SelectedIndex="7">
                         <x:String>300</x:String>
                         <x:String>1200</x:String>
                         <x:String>2400</x:String>
                         <x:String>4800</x:String>
+                        <x:String>9600</x:String>
                         <x:String>19200</x:String>
                         <x:String>38400</x:String>
                         <x:String>57600</x:String>
@@ -58,7 +59,7 @@
 
         <StackPanel Grid.Row="3" Margin="10" Orientation="Horizontal" FlowDirection="RightToLeft" >
             <Button x:Uid="Connect" Margin="0,0,10,0" x:Name="ConnectButton" Click="ConnectButton_Click">Connect</Button>
-            <Button x:Uid="Connect" Margin="0,0,10,0" x:Name="CancelButton" Click="CancelButton_Click" IsEnabled="False">Cancel</Button>
+            <Button x:Uid="Cancel" Margin="0,0,10,0" x:Name="CancelButton" Click="CancelButton_Click" IsEnabled="False">Cancel</Button>
             <Button x:Uid="RefreshBtn" Margin="0,0,10,0" x:Name="RefreshButton" Click="RefreshButton_Click">Refresh</Button>
         </StackPanel>
     </Grid>
